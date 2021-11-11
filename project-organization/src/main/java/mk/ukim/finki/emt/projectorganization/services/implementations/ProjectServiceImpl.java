@@ -11,6 +11,9 @@ import mk.ukim.finki.emt.projectorganization.services.ProjectService;
 import mk.ukim.finki.emt.projectorganization.services.forms.ProjectForm;
 import mk.ukim.finki.emt.projectorganization.services.forms.ProjectStageForm;
 import mk.ukim.finki.emt.projectorganization.services.forms.TaskForm;
+import mk.ukim.finki.emt.sharedkernel.domain.events.AssignedProjectStage;
+import mk.ukim.finki.emt.sharedkernel.domain.events.AssignedTask;
+import mk.ukim.finki.emt.sharedkernel.infrastructure.DomainEventPublisher;
 import org.springframework.stereotype.Service;
 
 import javax.validation.ConstraintViolation;
@@ -25,6 +28,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
     private final Validator validator;
+    private final DomainEventPublisher domainEventPublisher;
 
     @Override
     public List<Project> findAll() {
@@ -68,8 +72,12 @@ public class ProjectServiceImpl implements ProjectService {
             ConstraintViolationException {
         this.validateForm(projectStageForm);
         Project project = this.findById(projectStageForm.getProjectId());
+        ProjectStage projectStage = new ProjectStage(projectStageForm);
 
-        project.addProjectStageToProject(new ProjectStage(projectStageForm));
+        project.addProjectStageToProject(projectStage);
+        this.domainEventPublisher.publish(
+                new AssignedProjectStage(projectStage.getId().getId(), projectStageForm.getTeamId())
+        );
 
         return this.projectRepository.save(project);
     }
@@ -99,8 +107,10 @@ public class ProjectServiceImpl implements ProjectService {
             ConstraintViolationException {
         this.validateForm(taskForm);
         Project project = this.findById(id);
+        Task task = new Task(taskForm);
 
-        project.addTaskToProjectStage(taskForm.getProjectStageId(), new Task(taskForm));
+        project.addTaskToProjectStage(taskForm.getProjectStageId(), task);
+        domainEventPublisher.publish(new AssignedTask(task.getId().getId(), taskForm.getEmployeeId()));
 
         return this.projectRepository.save(project);
     }
