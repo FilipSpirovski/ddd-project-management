@@ -10,6 +10,9 @@ public class AssignedTask extends DomainEvent {
 
     private String employeeId;
 
+    public AssignedTask() {
+    }
+
     public AssignedTask(String topic) {
         super(TopicHolder.TOPIC_TASK_ASSIGNED_TO);
     }

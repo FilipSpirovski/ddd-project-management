@@ -10,6 +10,9 @@ public class AssignedProjectStage extends DomainEvent {
 
     private String teamId;
 
+    public AssignedProjectStage() {
+    }
+
     public AssignedProjectStage(String topic) {
         super(TopicHolder.TOPIC_PROJECT_STAGE_ASSIGNED_TO);
     }

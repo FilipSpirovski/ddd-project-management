@@ -16,6 +16,9 @@ public class TaskRemainingTime extends DomainEvent {
 
     private long seconds;
 
+    public TaskRemainingTime() {
+    }
+
     public TaskRemainingTime(String topic) {
         super(TopicHolder.TOPIC_TASK_REMAINING_TIME);
     }
